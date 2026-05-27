@@ -3,6 +3,10 @@ services:
     image: postgres:16
     env_file:
       - .env
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - postgres_password
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -16,6 +20,12 @@ services:
       context: ./backend
     env_file:
       - .env
+    environment:
+      DJANGO_SECRET_KEY_FILE: /run/secrets/django_secret_key
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - django_secret_key
+      - postgres_password
     depends_on:
       postgres-service:
         condition: service_healthy
@@ -30,6 +40,12 @@ services:
       context: ./backend
     env_file:
       - .env
+    environment:
+      DJANGO_SECRET_KEY_FILE: /run/secrets/django_secret_key
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    secrets:
+      - django_secret_key
+      - postgres_password
     depends_on:
       postgres-service:
         condition: service_healthy
@@ -37,9 +53,9 @@ services:
         condition: service_completed_successfully
     volumes:
       - staticfiles:/app/staticfiles
-    expose:
-      - "8000"
     command: gunicorn lab1.wsgi:application --bind 0.0.0.0:8000
+    ports:
+     - "8000:8000"
 
   nginx-service:
     build:
@@ -58,3 +74,9 @@ services:
 volumes:
   postgres_data:
   staticfiles:
+
+secrets:
+  django_secret_key:
+    file: ./secrets/django_secret_key.txt
+  postgres_password:
+    file: ./secrets/postgres_password.txt
