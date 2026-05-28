@@ -17,18 +17,11 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-def get_env_or_secret(name, default=None):
-    secret_file = os.getenv(f'{name}_FILE')
-    if secret_file:
-        return Path(secret_file).read_text(encoding='utf-8').strip()
-    return os.getenv(name, default)
-
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = get_env_or_secret(
+SECRET_KEY = os.getenv(
     'DJANGO_SECRET_KEY',
     'django-insecure-q%*ve8tgw*%8gi$6di@=4o_rz@@s7)eb+s=1drwmr8a$$(a7v-',
 )
@@ -108,7 +101,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('POSTGRES_DB', 'lab1_db'),
         'USER': os.getenv('POSTGRES_USER', 'django'),
-        'PASSWORD': get_env_or_secret('POSTGRES_PASSWORD', 'django'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'django'),
         'HOST': os.getenv('POSTGRES_HOST', 'postgres-service'),
         'PORT': os.getenv('POSTGRES_PORT', '5432'),
     }

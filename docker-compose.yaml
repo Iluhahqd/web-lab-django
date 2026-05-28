@@ -3,10 +3,6 @@ services:
     image: postgres:16
     env_file:
       - .env
-    environment:
-      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
-    secrets:
-      - postgres_password
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -20,12 +16,6 @@ services:
       context: ./backend
     env_file:
       - .env
-    environment:
-      DJANGO_SECRET_KEY_FILE: /run/secrets/django_secret_key
-      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
-    secrets:
-      - django_secret_key
-      - postgres_password
     depends_on:
       postgres-service:
         condition: service_healthy
@@ -40,12 +30,6 @@ services:
       context: ./backend
     env_file:
       - .env
-    environment:
-      DJANGO_SECRET_KEY_FILE: /run/secrets/django_secret_key
-      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
-    secrets:
-      - django_secret_key
-      - postgres_password
     depends_on:
       postgres-service:
         condition: service_healthy
@@ -68,6 +52,11 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    secrets:
+      - source: nginx_selfsigned_cert
+        target: /etc/nginx/certs/localhost.crt
+      - source: nginx_selfsigned_key
+        target: /etc/nginx/certs/localhost.key
     volumes:
       - staticfiles:/staticfiles:ro
 
@@ -76,7 +65,7 @@ volumes:
   staticfiles:
 
 secrets:
-  django_secret_key:
-    file: ./secrets/django_secret_key.txt
-  postgres_password:
-    file: ./secrets/postgres_password.txt
+  nginx_selfsigned_cert:
+    file: ./secrets/localhost.crt
+  nginx_selfsigned_key:
+    file: ./secrets/localhost.key
